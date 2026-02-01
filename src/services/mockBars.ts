@@ -4,8 +4,8 @@ export const mockBars: Bar[] = [
     {
         id: 1,
         name: "Sky Lounge",
-        address: "Quận 1, TP.HCM",
-        city: "HCM",
+        address: "Quận 1, Hồ Chí Minh",
+        city: "Hồ Chí Minh",
         district: "Quận 1",
         type: "rooftop",
         priceRange: "high",
@@ -35,8 +35,8 @@ export const mockBars: Bar[] = [
     {
         id: 2,
         name: "Underground Club",
-        address: "Quận 3, TP.HCM",
-        city: "HCM",
+        address: "Quận 3, Hồ Chí Minh",
+        city: "Hồ Chí Minh",
         district: "Quận 3",
         type: "club",
         priceRange: "mid",

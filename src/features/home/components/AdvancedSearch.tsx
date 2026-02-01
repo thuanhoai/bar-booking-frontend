@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 interface SearchState {
@@ -6,6 +6,32 @@ interface SearchState {
     district: string
     type: string
     priceRange: string
+}
+
+/* ===== LOCATION TYPES ===== */
+type City = {
+    code: number
+    name: string
+}
+
+type District = {
+    code: number
+    name: string
+}
+
+/* ===== LOCATION API ===== */
+const locationApi = {
+    getCities: async (): Promise<City[]> => {
+        const res = await fetch("https://provinces.open-api.vn/api/p/")
+        return res.json()
+    },
+    getDistrictsByCityCode: async (code: number): Promise<District[]> => {
+        const res = await fetch(
+            `https://provinces.open-api.vn/api/p/${code}?depth=2`
+        )
+        const data = await res.json()
+        return data.districts || []
+    },
 }
 
 export default function AdvancedSearch() {
@@ -17,6 +43,30 @@ export default function AdvancedSearch() {
         type: "",
         priceRange: "",
     })
+
+    const [cities, setCities] = useState<City[]>([])
+    const [districts, setDistricts] = useState<District[]>([])
+
+    /* ===== LOAD CITIES ===== */
+    useEffect(() => {
+        locationApi.getCities().then(setCities)
+    }, [])
+
+    /* ===== LOAD DISTRICTS WHEN CITY CHANGE ===== */
+    useEffect(() => {
+        if (!search.city) {
+            setDistricts([])
+            setSearch((prev) => ({ ...prev, district: "" }))
+            return
+        }
+
+        const city = cities.find((c) => c.name === search.city)
+        if (!city) return
+
+        locationApi
+            .getDistrictsByCityCode(city.code)
+            .then(setDistricts)
+    }, [search.city, cities])
 
     const onChange = (
         e: React.ChangeEvent<HTMLSelectElement>
@@ -51,9 +101,11 @@ export default function AdvancedSearch() {
                             onChange={onChange}
                         >
                             <option value="">Tất cả</option>
-                            <option value="HCM">Hồ Chí Minh</option>
-                            <option value="HN">Hà Nội</option>
-                            <option value="DN">Đà Nẵng</option>
+                            {cities.map((c) => (
+                                <option key={c.code} value={c.name}>
+                                    {c.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -67,11 +119,14 @@ export default function AdvancedSearch() {
                             className="form-select"
                             value={search.district}
                             onChange={onChange}
+                            disabled={!districts.length}
                         >
                             <option value="">Tất cả</option>
-                            <option value="1">Quận 1</option>
-                            <option value="3">Quận 3</option>
-                            <option value="7">Quận 7</option>
+                            {districts.map((d) => (
+                                <option key={d.code} value={d.name}>
+                                    {d.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
 

@@ -15,9 +15,20 @@ export default function Header() {
     const [keyword, setKeyword] = useState("")
     const navigate = useNavigate()
 
+    // 🔥 SAME normalize logic as BarListPage
+    const normalizeText = (str: string) =>
+        str
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+
     const handleSearch = () => {
-        if (!keyword.trim()) return
-        navigate(`/bars?keyword=${encodeURIComponent(keyword.trim())}`)
+        const q = normalizeText(keyword)
+        if (!q) return
+
+        navigate(`/bars?keyword=${encodeURIComponent(q)}`)
         setKeyword("")
         setOpenSearch(false)
     }
@@ -27,7 +38,10 @@ export default function Header() {
             {/* ================= DESKTOP ================= */}
             <header className="d-none d-md-block bg-dark text-white border-bottom">
                 <div className="container d-flex align-items-center gap-4 py-3">
-                    <Link to="/" className="fw-bold fs-4 text-white text-decoration-none">
+                    <Link
+                        to="/"
+                        className="fw-bold fs-4 text-white text-decoration-none"
+                    >
                         🍸 BarBooking
                     </Link>
 
@@ -38,7 +52,9 @@ export default function Header() {
                         style={{ maxWidth: 420 }}
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                        onKeyDown={(e) =>
+                            e.key === "Enter" && handleSearch()
+                        }
                     />
                 </div>
             </header>
@@ -47,7 +63,10 @@ export default function Header() {
             <header className="d-md-none header-mobile">
                 <div className="mobile-topbar d-flex align-items-center justify-content-between px-3">
                     {/* LEFT MENU */}
-                    <button className="icon-btn" onClick={() => setOpenMenu(true)}>
+                    <button
+                        className="icon-btn"
+                        onClick={() => setOpenMenu(true)}
+                    >
                         <FaBars size={22} />
                     </button>
 
@@ -81,7 +100,9 @@ export default function Header() {
                             className="form-control"
                             placeholder="Tìm bar, rooftop, lounge..."
                             value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
+                            onChange={(e) =>
+                                setKeyword(e.target.value)
+                            }
                             onKeyDown={(e) =>
                                 e.key === "Enter" && handleSearch()
                             }
