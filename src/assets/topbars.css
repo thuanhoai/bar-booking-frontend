@@ -1,0 +1,32 @@
+/* Card tổng */
+.topbar-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.topbar-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Wrapper ảnh – CỐ ĐỊNH */
+.bar-image-wrapper {
+    height: 220px;
+    overflow: hidden;
+}
+
+.bar-image {
+    object-fit: cover;
+}
+
+
+/* Hover zoom ảnh */
+.topbar-card:hover .bar-image {
+    transform: scale(1.08);
+}
+
+/* Body card đều nhau */
+.topbar-card .card-body {
+    min-height: 150px;
+}

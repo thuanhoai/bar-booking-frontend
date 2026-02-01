@@ -1,0 +1,7 @@
+export function Loading() {
+    return (
+        <div className="text-center my-5">
+            <div className="spinner-border text-primary" />
+        </div>
+    )
+}
