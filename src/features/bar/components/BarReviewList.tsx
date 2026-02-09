@@ -14,9 +14,7 @@ export default function BarReviewList({ reviews }: Props) {
                 >
                     <div className="d-flex justify-content-between">
                         <strong>{r.user}</strong>
-                        <span className="text-warning">
-                            {r.rating}⭐
-                        </span>
+
                     </div>
 
                     <p className="text-secondary mb-1">

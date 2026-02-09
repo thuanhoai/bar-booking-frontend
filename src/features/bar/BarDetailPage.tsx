@@ -5,48 +5,43 @@ import { barApi } from "./services/barApi"
 import type { Bar } from "./types"
 
 import SEO from "../../components/SEO"
+import BreadcrumbBar from "../blog/components/BreadcrumbBar"
+
 import BarHeroSection from "./components/BarHeroSection"
-import BarGallery from "./components/BarGallery"
 import BarBookingModal from "./components/BarBookingModal"
 import BarFAQ from "./components/BarFAQ"
 import BarStickyBooking from "./components/BarStickyBooking"
-import BarMap from "./components/BarMap"
-
-import { barFaqs } from "./barFaq"
-import { barReviews } from "./barReviews"
-
-import BarRatingSummary from "./components/BarRatingSummary"
-import BarReviewList from "./components/BarReviewList"
 import BarRelatedList from "./components/BarRelatedList"
 import BarRecentlyViewed from "./components/BarRecentlyViewed"
 
+import { barFaqs } from "./barFaq"
 import { addRecentlyViewed } from "../../utils/recentlyViewed"
-import { mockBars } from "../../services/mockBars"
-import BreadcrumbBar from "../blog/components/BreadcrumbBar"
 
 export default function BarDetailPage() {
     const { id } = useParams<{ id: string }>()
+
     const [bar, setBar] = useState<Bar | null>(null)
+    const [loading, setLoading] = useState(true)
     const [showBooking, setShowBooking] = useState(false)
     const [showSticky, setShowSticky] = useState(false)
-    const [loading, setLoading] = useState(true)
 
-    /** Fetch bar detail */
+    /* ================= FETCH BAR ================= */
     useEffect(() => {
         if (!id) return
 
-        barApi.getBarById(Number(id)).then((data) => {
-            setBar(data ?? null)
-            setLoading(false)
-        })
+        setLoading(true)
+        barApi
+            .getBarById(Number(id))
+            .then((data) => setBar(data ?? null))
+            .finally(() => setLoading(false))
     }, [id])
 
-    /** Save recently viewed */
+    /* ================= RECENTLY VIEWED ================= */
     useEffect(() => {
         if (bar) addRecentlyViewed(bar)
     }, [bar])
 
-    /** Sticky CTA logic */
+    /* ================= STICKY CTA ================= */
     useEffect(() => {
         const onScroll = () => {
             setShowSticky(window.scrollY > 300)
@@ -56,82 +51,70 @@ export default function BarDetailPage() {
         return () => window.removeEventListener("scroll", onScroll)
     }, [])
 
-    /** ✅ FIX: chừa chỗ cho sticky */
+    /* ================= RELATED BARS (TẠM TRỐNG) =================
+       👉 Giai đoạn này chưa có API thì trả mảng rỗng
+       👉 Sau này thay bằng API /bars?city=&exclude=
+    */
+    const relatedBars = useMemo<Bar[]>(() => {
+        return []
+    }, [])
 
-
-    /** Related bars */
-    const relatedBars = useMemo(() => {
-        if (!bar) return []
-
-        return mockBars
-            .filter(b => b.id !== bar.id && b.city === bar.city)
-            .sort((a, b) => {
-                if (a.type === bar.type) return -1
-                if (b.type === bar.type) return 1
-                return b.rating - a.rating
-            })
-            .slice(0, 6)
-    }, [bar])
-
-    if (loading) return <p>Đang tải dữ liệu...</p>
-    if (!bar) return <p>Không tìm thấy quán bar</p>
+    /* ================= STATES ================= */
+    if (loading) return <p className="text-center my-5">Đang tải dữ liệu…</p>
+    if (!bar) return <p className="text-center my-5">Không tìm thấy quán bar</p>
 
     return (
         <>
-            {/* SEO */}
+            {/* ================= SEO ================= */}
             <SEO
                 title={`${bar.name} | Đặt bàn bar uy tín`}
-                description={`${bar.name} tại ${bar.district}, ${bar.city}. Đánh giá ${bar.rating}/5.`}
+                description={`${bar.name} tại ${bar.district}, ${bar.city}`}
                 image={bar.image}
                 url={`https://your-domain.com/bars/${bar.id}`}
             />
+
+            {/* ================= BREADCRUMB ================= */}
             <BreadcrumbBar
                 items={[
                     { label: "Trang chủ", to: "/" },
-                    { label: "Danh sách", to: "/bars" },
-                    { label: bar.name }
+                    { label: "Danh sách bar", to: "/bars" },
+                    { label: bar.name },
                 ]}
             />
-            {/* HERO */}
+
+            {/* ================= HERO ================= */}
             <BarHeroSection
                 bar={bar}
                 onBook={() => setShowBooking(true)}
                 showMobileCTA={!showSticky}
             />
 
-            {/* GALLERY */}
+            {/* ================= RELATED ================= */}
+            {relatedBars.length > 0 && (
+                <BarRelatedList bars={relatedBars} />
+            )}
 
-
-            {/* DESCRIPTION */}
-
-
-            {/* REVIEWS */}
-
-
-            {/* MAP */}
-
-
-            {/* RELATED */}
-            <BarRelatedList bars={relatedBars} />
-
-            {/* RECENTLY VIEWED */}
+            {/* ================= RECENTLY VIEWED ================= */}
             <BarRecentlyViewed />
-            {!showSticky && <BarRecentlyViewed />}
 
-            {/* STICKY BOOKING */}
-            {showSticky && (<BarStickyBooking bar={bar} onBook={() => { if (bar.partnerStatus === "partner") { setShowBooking(true) } }} />)}
-            {/* FAQ */}
+            {/* ================= STICKY BOOKING ================= */}
+            {showSticky && bar.partnerStatus === "partner" && (
+                <BarStickyBooking
+                    bar={bar}
+                    onBook={() => setShowBooking(true)}
+                />
+            )}
+
+            {/* ================= FAQ ================= */}
             <section className="container my-5">
                 <BarFAQ faqs={barFaqs} />
             </section>
 
-
-
-            {/* MODAL */}
+            {/* ================= BOOKING MODAL ================= */}
             <BarBookingModal
                 show={showBooking}
-                onClose={() => setShowBooking(false)}
                 bar={bar}
+                onClose={() => setShowBooking(false)}
             />
         </>
     )

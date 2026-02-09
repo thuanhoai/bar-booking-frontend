@@ -142,20 +142,7 @@ export default function BarCard({
                 />
 
                 {/* RATING */}
-                <span
-                    style={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        background: "rgba(0,0,0,0.7)",
-                        padding: "4px 8px",
-                        borderRadius: 8,
-                        fontSize: 12,
-                        color: "#fff",
-                    }}
-                >
-                    ⭐ {bar.rating}
-                </span>
+
 
                 {/* PARTNER BADGE */}
                 {isPartner && (

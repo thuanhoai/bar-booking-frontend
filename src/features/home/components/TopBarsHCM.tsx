@@ -27,7 +27,7 @@ export default function TopBarsHCM() {
             if (!mounted) return
 
             const hcmBars: RankedBar[] = data
-                .filter(bar => bar.city === "HCM")
+                .filter(bar => bar.city === "Hồ Chí Minh")
                 .sort((a, b) => {
                     if (a.partnerStatus === "partner" && b.partnerStatus !== "partner") return -1
                     if (b.partnerStatus === "partner" && a.partnerStatus !== "partner") return 1
@@ -191,12 +191,7 @@ export default function TopBarsHCM() {
                                         </div>
 
                                         <div className="d-flex justify-content-between align-items-center">
-                                            <span
-                                                style={{ fontSize: 10 }}
-                                                className="text-warning"
-                                            >
-                                                ⭐ {bar.rating}
-                                            </span>
+
 
                                             <span
                                                 style={{

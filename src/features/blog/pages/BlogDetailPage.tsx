@@ -1,11 +1,51 @@
 import { Link, useParams } from "react-router-dom"
-import { BLOGS } from "../data/blogData"
-import "../blog.css"
+import { useEffect, useState } from "react"
 import BreadcrumbBar from "../components/BreadcrumbBar"
+import { blogApi } from "../data/blog.api"
+import type { Blog } from "../types"
+import "../blog.css"
 
 export default function BlogDetailPage() {
     const { id } = useParams()
-    const post = BLOGS.find(b => b.id === Number(id))
+    const [post, setPost] = useState<Blog | null>(null)
+    const [related, setRelated] = useState<Blog[]>([])
+    const [loading, setLoading] = useState(true)
+
+    /* ================= LOAD BLOG ================= */
+    useEffect(() => {
+        if (!id) return
+
+        const loadData = async () => {
+            try {
+                setLoading(true)
+
+                // 1️⃣ lấy bài hiện tại
+                const blog = await blogApi.getBlogById(Number(id))
+                setPost(blog)
+
+                // 2️⃣ lấy các bài liên quan (logic cũ)
+                const allBlogs = await blogApi.getBlogs()
+                const relatedBlogs = allBlogs
+                    .filter(b => b.id !== blog.id)
+                    .slice(0, 5)
+
+                setRelated(relatedBlogs)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadData()
+    }, [id])
+
+    /* ================= STATES ================= */
+    if (loading) {
+        return (
+            <div className="container my-5 text-white">
+                Đang tải bài viết...
+            </div>
+        )
+    }
 
     if (!post) {
         return (
@@ -14,10 +54,6 @@ export default function BlogDetailPage() {
             </div>
         )
     }
-
-    const related = BLOGS
-        .filter(b => b.id !== post.id)
-        .slice(0, 5)
 
     return (
         <div className="container my-4 blog-detail-page">
@@ -30,12 +66,10 @@ export default function BlogDetailPage() {
                 ]}
             />
 
-
             <div className="row g-4">
 
                 {/* ================= MAIN ================= */}
                 <div className="col-12 col-lg-8">
-
                     <article className="blog-detail-card">
 
                         {/* TITLE */}
@@ -50,31 +84,62 @@ export default function BlogDetailPage() {
                             <span>⏱ {post.readTime}</span>
                         </div>
 
-                        {/* HERO IMAGE */}
-                        <img
-                            src={post.image}
-                            alt={post.title}
-                            className="blog-hero"
-                        />
+                        {/* EXCERPT */}
+                        {post.excerpt && (
+                            <p className="blog-excerpt">
+                                {post.excerpt}
+                            </p>
+                        )}
 
-                        {/* TOC BOX */}
-                        <div className="blog-toc">
-                            <div className="toc-title">
-                                NỘI DUNG CHÍNH
+                        {/* TOC */}
+                        {post.sections && post.sections.length > 0 && (
+                            <div className="blog-toc">
+                                <div className="toc-title">
+                                    NỘI DUNG CHÍNH
+                                </div>
+
+                                <ul>
+                                    {post.sections.map((sec, index) => (
+                                        <li key={index}>
+                                            <a
+                                                href={`#section-${index}`}
+                                                className="toc-link"
+                                            >
+                                                {sec.heading}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-
-                            <ul>
-                                <li>Giới thiệu tổng quan</li>
-                                <li>Địa điểm nổi bật</li>
-                                <li>Kinh nghiệm đi thực tế</li>
-                                <li>Chi phí & lưu ý</li>
-                                <li>Kết luận</li>
-                            </ul>
-                        </div>
+                        )}
 
                         {/* CONTENT */}
                         <div className="blog-content">
-                            {post.content}
+                            {post.sections?.map((sec, index) => (
+                                <section
+                                    key={index}
+                                    id={`section-${index}`}
+                                    className="blog-section"
+                                >
+                                    <h2 className="blog-section-title">
+                                        {sec.heading}
+                                    </h2>
+
+                                    <div className="blog-section-content">
+                                        {sec.content}
+                                    </div>
+
+                                    {sec.image && (
+                                        <div className="blog-section-image-wrap">
+                                            <img
+                                                src={sec.image}
+                                                alt={sec.heading}
+                                                className="blog-section-image"
+                                            />
+                                        </div>
+                                    )}
+                                </section>
+                            ))}
                         </div>
 
                     </article>
@@ -102,7 +167,6 @@ export default function BlogDetailPage() {
                         </aside>
                     </div>
                 </div>
-
 
             </div>
         </div>

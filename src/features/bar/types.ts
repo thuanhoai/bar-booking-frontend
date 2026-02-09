@@ -3,58 +3,45 @@ import { z } from "zod"
 /* =========================
    BAR
 ========================= */
+
 export interface OpeningHour {
-    day:
-    | "Thứ 2"
-    | "Thứ 3"
-    | "Thứ 4"
-    | "Thứ 5"
-    | "Thứ 6"
-    | "Thứ 7"
-    | "Chủ nhật"
-    open: string // "18:00"
-    close: string // "02:00"
+    day: string
+    open: string
+    close: string
 }
+
+/* ✅ SECTION CỦA BAR */
+export interface BarSection {
+    id: number
+    title: string
+    content: string
+    sortOrder?: number
+    status?: string
+}
+
 export interface Bar {
     id: number
     name: string
-
-    /** Địa chỉ đầy đủ (hiển thị UI) */
     address: string
-
-    /** Dùng cho filter / SEO */
     city: string
     district: string
-
-    /** Phân loại */
-    type: "lounge" | "club" | "rooftop" | "karaoke"
-
-    /** Mức giá */
-    priceRange: "low" | "mid" | "high"
-
-    /** Đánh giá */
+    type: string
+    priceRange: string
     rating: number
-    bookingCount?: number
-    /** Trạng thái hợp tác */
-    partnerStatus: "partner" | "non-partner"
-    /** Ảnh đại diện */
-    image: string
-
-    /** Gallery ảnh (hero section) */
-    gallery?: string[]
-
-    /** Mô tả chi tiết */
-    description: string
-
-    /** Hotline */
-    phone?: string
-
-    /** Giờ mở cửa (optional – cho SEO sau) */
-
+    bookingCount: number
+    partnerStatus: string
+    image?: string
     images?: string[]
-    openingHours?: OpeningHour[]
+    gallery?: string[]
+    description?: string
     lat?: number
     lng?: number
+    phone?: string
+
+    openingHours?: OpeningHour[]
+
+    /* ✅ THÊM – KHÔNG ẢNH HƯỞNG LOGIC CŨ */
+    sections?: BarSection[]
 }
 
 /* =========================

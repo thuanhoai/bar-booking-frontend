@@ -128,12 +128,7 @@ export default function BarRecentlyViewed() {
                                         </div>
 
                                         <div className="d-flex justify-content-between align-items-center">
-                                            <span
-                                                style={{ fontSize: 10 }}
-                                                className="text-warning"
-                                            >
-                                                ⭐ {bar.rating}
-                                            </span>
+
 
                                             <span
                                                 style={{

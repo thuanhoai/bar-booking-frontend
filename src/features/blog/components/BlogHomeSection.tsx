@@ -1,12 +1,45 @@
-import { Link, useNavigate } from "react-router-dom"
-import { BLOGS } from "../data/blogData"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { blogApi } from "../data/blog.api"
+import type { Blog } from "../types"
 import "../blog.css"
 
 export default function BlogHomeSection() {
     const navigate = useNavigate()
+    const location = useLocation() // ✅ detect quay lại trang
+    const [blogs, setBlogs] = useState<Blog[]>([])
+    const [loading, setLoading] = useState(true)
 
-    // chỉ lấy 6 bài mới nhất để show homepage
-    const blogs = BLOGS.slice(0, 6)
+    /* ================= LOAD BLOGS ================= */
+    useEffect(() => {
+        let mounted = true
+
+        blogApi.getBlogs()
+            .then((data) => {
+                if (!mounted) return
+
+                // ✅ giữ logic cũ: 6 bài mới nhất
+                setBlogs(data.slice(0, 6))
+            })
+            .catch((err) => {
+                console.error("Load blogs error:", err)
+            })
+            .finally(() => {
+                if (mounted) setLoading(false)
+            })
+
+        return () => {
+            mounted = false
+        }
+    }, [location.key]) // ✅ QUAN TRỌNG
+
+    if (loading) {
+        return (
+            <section className="container my-5 text-white">
+                Đang tải blog...
+            </section>
+        )
+    }
 
     return (
         <section className="container my-5">
@@ -35,7 +68,6 @@ export default function BlogHomeSection() {
 
                                 {/* CONTENT */}
                                 <div className="flex-grow-1">
-
                                     <h6 className="blog-home-title">
                                         {blog.title}
                                     </h6>
@@ -43,7 +75,7 @@ export default function BlogHomeSection() {
                                     <div className="blog-home-meta">
                                         📅 {blog.date}
                                         <span className="mx-2">•</span>
-                                        ⏱ {blog.readTime}
+                                        ⏱ {blog.readTime ?? 5} phút
                                         <span className="mx-2">•</span>
                                         🏷 {blog.category}
                                     </div>
@@ -51,8 +83,8 @@ export default function BlogHomeSection() {
                                     <div className="blog-home-excerpt">
                                         {blog.excerpt}
                                     </div>
-
                                 </div>
+
                             </div>
                         </Link>
                     </div>

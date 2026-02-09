@@ -1,16 +1,20 @@
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 import type { BookingFormData } from "../types"
 import { bookingSchema } from "../types"
 import { useToast } from "../../../hooks/useToast"
+import { bookingService } from "../services/booking.service"
 
 interface Props {
     barId: number
+    onSuccess?: (phone: string) => void
 }
 
-export default function BarBookingForm({ barId }: Props) {
+export default function BarBookingForm({ barId, onSuccess }: Props) {
     const { success, error } = useToast()
     const [loading, setLoading] = useState(false)
 
@@ -19,22 +23,34 @@ export default function BarBookingForm({ barId }: Props) {
         handleSubmit,
         formState: { errors },
         reset,
+        control,
     } = useForm<BookingFormData>({
         resolver: zodResolver(bookingSchema),
-        defaultValues: {
-            people: 1,
-        },
+
     })
 
     const onSubmit = async (data: BookingFormData) => {
         try {
             setLoading(true)
 
-            await new Promise((res) => setTimeout(res, 1000))
+            const payload = {
+                bar_id: barId,
+                booking_date: data.date,
+                booking_time: data.time,
+                people_count: data.people,
+                customer_name: data.name,
+                customer_phone: data.phone,
+                customer_note: data.note,
+            }
 
-            console.log("BOOKING:", { ...data, barId })
+            await bookingService.create(payload)
 
-            success("Đặt bàn thành công!")
+            if (onSuccess) {
+                onSuccess(data.phone)
+            } else {
+                success("Đặt bàn thành công!")
+            }
+
             reset()
         } catch {
             error("Có lỗi xảy ra, vui lòng thử lại")
@@ -44,10 +60,7 @@ export default function BarBookingForm({ barId }: Props) {
     }
 
     return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="booking-form-ui"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="booking-form-ui">
             {/* Tên */}
             <input
                 placeholder="Tên"
@@ -66,17 +79,42 @@ export default function BarBookingForm({ barId }: Props) {
 
             {/* Date + Time */}
             <div className="row g-3">
+                {/* DATE */}
                 <div className="col-6">
-                    <input
-                        type="date"
-                        className={`form-control form-dark ${errors.date ? "is-invalid" : ""}`}
-                        {...register("date")}
+                    <Controller
+                        name="date"
+                        control={control}
+                        render={({ field }) => (
+                            <DatePicker
+                                placeholderText="Ngày"
+                                className={`form-control form-dark ${errors.date ? "is-invalid" : ""}`}
+                                selected={field.value ? new Date(field.value) : null}
+                                onChange={(date: Date | null) => {
+                                    if (!date) {
+                                        field.onChange("")
+                                        return
+                                    }
+
+                                    // ✅ FIX TIMEZONE – KHÔNG DÙNG toISOString
+                                    const yyyy = date.getFullYear()
+                                    const mm = String(date.getMonth() + 1).padStart(2, "0")
+                                    const dd = String(date.getDate()).padStart(2, "0")
+
+                                    field.onChange(`${yyyy}-${mm}-${dd}`)
+                                }}
+                                minDate={new Date()}
+                                dateFormat="dd/MM/yyyy"
+                                showPopperArrow={false}
+                                calendarStartDay={1}
+                            />
+                        )}
                     />
                     {errors.date && (
                         <div className="invalid-feedback">{errors.date.message}</div>
                     )}
                 </div>
 
+                {/* TIME */}
                 <div className="col-6">
                     <select
                         className={`form-control form-dark ${errors.time ? "is-invalid" : ""}`}

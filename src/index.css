@@ -3,6 +3,7 @@
 ========================= */
 @import "swiper/css";
 @import "swiper/css/navigation";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700&display=swap');
 
 /* =========================
    ROOT THEME
@@ -68,6 +69,8 @@ body {
   min-height: 100vh;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
+  font-family: 'Inter', sans-serif;
+  color: #e6e6e6;
 }
 
 /* Headings */
@@ -422,6 +425,88 @@ button:focus {
   .recently-name {
     font-size: 12px;
   }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.blog-section {
+  margin-bottom: 40px;
+  scroll-margin-top: 90px;
+}
+
+.toc-link {
+  color: #2f80ed;
+  text-decoration: none;
+}
+
+.bar-section-card {
+  color: #ffffff;
+  /* chữ trắng */
+}
+
+.bar-section-card h5 {
+  color: #ffffff;
+  /* tiêu đề trắng */
+  font-family: "Playfair Display", serif;
+}
+
+.bar-section-card .text-muted {
+  color: rgba(255, 255, 255, 0.85) !important;
+  line-height: 1.7;
+}
+
+/* Fix react-datepicker full width & sát trái */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+}
+
+/* Optional: đồng bộ chiều cao với input khác */
+.form-dark {
+  height: 48px;
+  padding: 10px 14px;
+}
+
+.blog-section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.blog-section-content {
+  line-height: 1.8;
+  color: #ddd;
+  white-space: pre-line;
+}
+
+.blog-section-image-wrap {
+  margin-top: 16px;
+}
+
+.blog-section-image {
+  width: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+  max-height: 420px;
+}
+
+.blog-excerpt {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #ccc;
+  margin: 16px 0 24px;
+  padding-left: 14px;
+  border-left: 3px solid #ffb703;
+  font-style: italic;
 }
 
 /* ===== MOBILE RẤT NHỎ ===== */

@@ -85,11 +85,42 @@ export default function BarHeroSection({
                         )}
                     </div>
 
-                    {/* ===== DESCRIPTION ===== */}
-                    <div className="bar-description-card">
-                        <h5>Giới thiệu</h5>
-                        <p>{bar.description}</p>
-                    </div>
+                    {/* ===== SECTION NAV (CLICK TO SCROLL) ===== */}
+                    {bar.sections && bar.sections.length > 0 && (
+                        <div className="bar-section-nav mb-3">
+                            {bar.sections.map(sec => (
+                                <a
+                                    key={sec.id}
+                                    href={`#section-${sec.id}`}
+                                    className="me-3 text-decoration-none fw-semibold"
+                                >
+                                    {sec.title}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* ===== DEFAULT DESCRIPTION ===== */}
+                    {bar.description && (
+                        <div className="bar-description-card">
+                            <h5>Giới thiệu</h5>
+                            <p>{bar.description}</p>
+                        </div>
+                    )}
+
+                    {/* ===== BAR SECTIONS CONTENT ===== */}
+                    {bar.sections?.map(sec => (
+                        <div
+                            key={sec.id}
+                            id={`section-${sec.id}`}
+                            className="bar-section-card"
+                        >
+                            <h5 className="fw-bold mb-2">{sec.title}</h5>
+                            <div className="text-muted">
+                                {sec.content}
+                            </div>
+                        </div>
+                    ))}
 
                     {/* ===== MAP ===== */}
                     <div className="bar-map-card">
@@ -100,7 +131,7 @@ export default function BarHeroSection({
                             width="100%"
                             height="260"
                             loading="lazy"
-                            style={{ border: 0, borderRadius: 12, }}
+                            style={{ border: 0, borderRadius: 12 }}
                         />
                     </div>
 
@@ -159,12 +190,27 @@ export default function BarHeroSection({
                                 </h6>
 
                                 <ul className="opening-hours">
-                                    {(bar.openingHours ?? []).map((h, i) => (
-                                        <li key={i}>
-                                            <span>{h.day}</span>
-                                            <span>{h.open} – {h.close}</span>
-                                        </li>
-                                    ))}
+                                    {(bar.openingHours ?? [])
+                                        .slice()
+                                        .sort((a, b) => {
+                                            const dayA = Number(a.day) === 0 ? 7 : Number(a.day)
+                                            const dayB = Number(b.day) === 0 ? 7 : Number(b.day)
+                                            return dayA - dayB
+                                        })
+                                        .map((h, i) => {
+                                            const dayNum = Number(h.day)
+
+                                            return (
+                                                <li key={i}>
+                                                    <span>
+                                                        {dayNum === 0 ? "Chủ nhật" : `Thứ ${dayNum + 1}`}
+                                                    </span>
+                                                    <span>
+                                                        {h.open} – {h.close}
+                                                    </span>
+                                                </li>
+                                            )
+                                        })}
                                 </ul>
                             </div>
 

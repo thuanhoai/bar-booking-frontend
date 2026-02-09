@@ -1,24 +1,49 @@
+import { useEffect, useState } from "react"
 import BlogCard from "../components/BlogCard"
-import BlogHero from "../components/BlogHero"
-import { BLOGS } from "../data/blogData"
-import "../blog.css"
 import BreadcrumbBar from "../components/BreadcrumbBar"
+import { blogApi } from "../data/blog.api"
+import type { Blog } from "../types"
+import "../blog.css"
 
 export default function BlogListPage() {
+    const [blogs, setBlogs] = useState<Blog[]>([])
+    const [loading, setLoading] = useState(true)
+
+    /* ================= LOAD BLOGS ================= */
+    useEffect(() => {
+        const loadBlogs = async () => {
+            try {
+                setLoading(true)
+                const data = await blogApi.getBlogs()
+                setBlogs(data)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadBlogs()
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="container my-5 text-white">
+                Đang tải bài viết...
+            </div>
+        )
+    }
+
     return (
         <div className="container my-5">
             {/* ===== BREADCRUMB ===== */}
             <BreadcrumbBar
                 items={[
                     { label: "Trang chủ", to: "/" },
-                    { label: "Danh sách", to: "/bars" },
-
+                    { label: "Blog", to: "/blog" },
                 ]}
             />
 
-
             <div className="row g-4">
-                {BLOGS.map((post) => (
+                {blogs.map(post => (
                     <div
                         key={post.id}
                         className="col-12 col-md-6 col-lg-4"
