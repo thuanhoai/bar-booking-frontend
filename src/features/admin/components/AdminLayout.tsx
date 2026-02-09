@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useNavigate } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import Topbar from "./Topbar"
 import { useEffect } from "react"

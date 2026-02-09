@@ -10,7 +10,6 @@ interface Props {
 export default function BarHeroSection({
     bar,
     onBook,
-    showMobileCTA,
 }: Props) {
 
     /* ===== GALLERY MERGE ===== */
